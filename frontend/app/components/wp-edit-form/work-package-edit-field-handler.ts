@@ -89,6 +89,10 @@ export class WorkPackageEditFieldHandler {
     return this.form.editMode;
   }
 
+  public get inFlight() {
+    return this.form.inFlight;
+  }
+
   public get active() {
     return true;
   }
@@ -163,7 +167,7 @@ export class WorkPackageEditFieldHandler {
     return !(this.form.editMode ||
     (this.field.required && this.field.isEmpty()) ||
     (this.isErrorenous && !this.isChanged()) ||
-    this.workPackage.inFlight);
+    this.inFlight);
   }
 
   /**

@@ -119,7 +119,6 @@ export class WorkPackageResource extends HalResource {
   public updatedAt:Date;
   public lockVersion:number;
   public description:any;
-  public inFlight:boolean;
   public activities:CollectionResourceInterface;
   public attachments:AttachmentCollectionResourceInterface;
 
@@ -420,7 +419,6 @@ export class WorkPackageResource extends HalResource {
 
   public save():ng.IPromise<WorkPackageResourceInterface> {
     var deferred = $q.defer();
-    this.inFlight = true;
     const wasNew = this.isNew;
     this.updateForm(this.$source)
       .then(form => {
@@ -458,15 +456,9 @@ export class WorkPackageResource extends HalResource {
           .catch(error => {
             deferred.reject(error);
             wpCacheService.updateWorkPackage(this as any);
-          })
-          .finally(() => {
-            this.inFlight = false;
           });
       })
-      .catch(() => {
-        this.inFlight = false;
-        deferred.reject();
-      });
+      .catch(deferred.reject);
 
     return deferred.promise;
   }

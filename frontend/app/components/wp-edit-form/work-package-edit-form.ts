@@ -65,6 +65,9 @@ export class WorkPackageEditForm {
   // The work package cache service subscription
   protected subscription:Subscription;
 
+  // Marks an active save operation
+  public inFlight:boolean = false;
+
   constructor(public workPackageId:string,
               public editContext:WorkPackageEditContext,
               public editMode = false) {
@@ -149,6 +152,7 @@ export class WorkPackageEditForm {
       return this.$q.when(this.workPackage);
     }
 
+    this.inFlight = true;
     const deferred = this.$q.defer();
     const isInitial = this.workPackage.isNew;
 
@@ -183,7 +187,7 @@ export class WorkPackageEditForm {
         }
       });
 
-    return deferred.promise;
+    return deferred.promise.finally(() => this.inFlight = false);
   }
 
   public stopEditing() {

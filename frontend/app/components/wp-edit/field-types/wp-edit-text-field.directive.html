@@ -4,7 +4,7 @@
        ng-model="vm.workPackage[vm.fieldName]"
        ng-required="vm.field.required"
        ng-focus="vm.handleUserFocus()"
-       ng-disabled="vm.workPackage.inFlight"
+       ng-disabled="vm.inFlight"
        ng-keydown="vm.handleUserSubmitOnEnter($event)"
        focus="vm.field.name === 'subject'"
        ng-attr-id="{{vm.htmlId}}" />
