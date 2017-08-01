@@ -68,6 +68,7 @@ class TimeEntry < ActiveRecord::Base
   after_initialize :set_default_activity
   before_validation :set_default_project
 
+  # TODO: move to create service
   def set_default_activity
     if new_record? && activity.nil?
       if default_activity = TimeEntryActivity.default
@@ -77,6 +78,7 @@ class TimeEntry < ActiveRecord::Base
     end
   end
 
+  # TODO: move to create service
   def set_default_project
     self.project ||= work_package.project if work_package
   end
@@ -123,6 +125,8 @@ class TimeEntry < ActiveRecord::Base
   end
 
   private
+  # TODO: move to contract
+  # TODO: adapt timelog controller to make use of contract/service
 
   def validate_hours_are_in_range
     errors.add :hours, :invalid if hours && (hours < 0 || hours >= 1000)
