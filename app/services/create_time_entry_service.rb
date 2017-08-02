@@ -39,21 +39,32 @@ class CreateTimeEntryService
     @user = user
   end
 
-  def call(time_entry)
-    create(time_entry)
-  end
+  def call(params)
+    time_entry = TimeEntry.new
 
-  private
-
-  def create(time_entry)
     initialize_contract(time_entry)
+
     assign_defaults(time_entry)
+
+    time_entry.attributes = params
 
     result, errors = validate_and_save(time_entry)
 
     ServiceResult.new(success: result,
                       errors: errors,
                       result: time_entry)
+  end
+
+  private
+
+  def validate_and_save(object)
+    if !contract.validate
+      [false, contract.errors]
+    elsif !object.save
+      [false, object.errors]
+    else
+      [object, object.errors]
+    end
   end
 
   def assign_defaults(time_entry)

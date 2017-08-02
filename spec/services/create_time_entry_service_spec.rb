@@ -1,5 +1,3 @@
-#-- encoding: UTF-8
-
 #-- copyright
 # OpenProject is a project management system.
 # Copyright (C) 2012-2017 the OpenProject Foundation (OPF)
@@ -28,25 +26,55 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-module TimeEntries
-  class CreateContract < BaseContract
-    # TODO: add tests
-    attribute :user_id do
-      errors.add :user_id, :invalid if model.user != user
-    end
+require 'spec_helper'
 
-    def validate
-      user_allowed_to_add
-
-      super
-    end
-
-    private
-
-    def user_allowed_to_add
-      if model.project && !user.allowed_to?(:log_time, model.project)
-        errors.add :base, :error_unauthorized
-      end
-    end
+describe CreateTimeEntryService, type: :model do
+  let(:user) { FactoryGirl.build_stubbed(:user) }
+  let(:contract_instance) do
+    contract = double('contract_instance')
+    allow(contract)
+      .to receive(:validate)
+      .and_return(contract_valid)
+    contract
   end
+
+  let(:contract_valid) { true }
+  let(:time_entry_valid) { true }
+
+  let(:instance) { described_class.new(user: user) }
+  let(:time_entry_instance) do
+    time_entry = FactoryGirl.build_stubbed(:time_entry)
+
+    expect(time_entry)
+      .to receive(:save)
+      .and_return(time_entry_valid)
+
+    time_entry
+  end
+  let(:params) { {} }
+
+  before do
+    allow(TimeEntries::CreateContract)
+      .to receive(:new)
+      .with(anything, user)
+      .and_return(contract_instance)
+
+    allow(TimeEntry)
+      .to receive(:new)
+      .and_return(time_entry_instance)
+  end
+
+  subject { instance.call(params) }
+
+  it 'creates a new time entry' do
+    expect(subject.result)
+      .to eql time_entry_instance
+  end
+
+  it 'is a success' do
+    is_expected
+      .to be_success
+  end
+
+  # TODO: extend tests
 end
